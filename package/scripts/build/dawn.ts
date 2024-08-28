@@ -18,6 +18,9 @@ const commonArgs = {
   DAWN_BUILD_MONOLITHIC_LIBRARY: "ON",
   DAWN_ENABLE_OPENGLES: "OFF",
   DAWN_ENABLE_DESKTOP_GL: "OFF",
+  CMAKE_CXX_FLAGS: "-Os -fdata-sections -ffunction-sections",  // Size optimization flags
+  CMAKE_C_FLAGS: "-Os -fdata-sections -ffunction-sections",    // Size optimization flags
+  CMAKE_SHARED_LINKER_FLAGS: "-Wl,--gc-sections",             // Remove unused sections
 };
 
 const PLATFORM_MAP: Record<string, string> = {
@@ -27,9 +30,9 @@ const PLATFORM_MAP: Record<string, string> = {
 };
 
 const android = {
-  platforms: ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"] as Platform[],
+  platforms: ["arm64-v8a", "x86_64"] as Platform[],
   args: {
-    CMAKE_TOOLCHAIN_FILE: "$ANDROID_NDK/build/cmake/android.toolchain.cmake",
+    CMAKE_TOOLCHAIN_FILE: "/Users/vraspar/Library/Android/sdk/ndk/27.0.12077973/build/cmake/android.toolchain.cmake",
     ANDROID_PLATFORM: "android-26",
     ...commonArgs,
   },
@@ -50,7 +53,7 @@ const ios = {
   process.chdir("..");
   process.chdir("externals/dawn");
   $("git reset --hard HEAD");
-  //$(`git apply ${__dirname}/static_build.patch`);
+  $(`git apply ${__dirname}/static_build.patch`);
   process.chdir("../..");
 
   // Build Android

@@ -72,7 +72,11 @@ export const $ = (command: string) => {
 
 const serializeCMakeArgs = (args: Record<string, string>) => {
   return Object.keys(args)
-    .map((key) => `-D${key}=${args[key]}`)
+    .map((key) => {
+      // Quote the argument if it contains spaces
+      const value = args[key].includes(' ') ? `"${args[key]}"` : args[key];
+      return `-D${key}=${value}`;
+    })
     .join(" ");
 };
 
@@ -97,7 +101,12 @@ export const copyLib = (os: OS, platform: Platform, sdk?: string) => {
   if (os === "android") {
     console.log("Strip debug symbols from libwebgpu_dawn.a...");
     $(
-      `$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-strip externals/dawn/out/${out}/src/dawn/native/libwebgpu_dawn.so`,
+      `/Users/vraspar/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-strip externals/dawn/out/${out}/src/dawn/native/libwebgpu_dawn.so`,
+    );
+  } else {
+    console.log("Strip debug symbols from libwebgpu_dawn.so...");
+    $(
+      `strip -S externals/dawn/out/${out}/src/dawn/native/libwebgpu_dawn.a`,
     );
   }
   [
